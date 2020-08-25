@@ -1,0 +1,29 @@
+#!/bin/sh
+
+# This requires that you have firefox-bin installed on NixOS.
+
+set -eu -o pipefail
+
+firefox_wrapper_1=$(which firefox)
+firefox_wrapper_2=$(cat "$firefox_wrapper_1" | grep '^exec ' | grep -o -P '/nix/store/[^"]+' | head -n 1)
+firefox_binary=$(cat "$firefox_wrapper_2" | grep '^exec ' | grep -o -P '/nix/store/[^"]+' | head -n 1)
+firefox_rpath=$(patchelf --print-rpath "$firefox_binary")
+firefox_interpreter=$(patchelf --print-interpreter "$firefox_binary")
+
+for i in ~/.cache/ms-playwright/firefox-*/firefox/firefox; do
+	# Replace the redundant `firefox` with a wrapper over `firefox-bin`
+	cat "$firefox_wrapper_1" "$firefox_wrapper_2" | grep '^export ' > $(dirname "$i")/firefox
+    echo "exec \"${i}-bin\" \"\$@\"" >> $(dirname "$i")/firefox
+	chmod +x "$(dirname "$i")/firefox"
+done
+
+for i in ~/.cache/ms-playwright/firefox-*/firefox/firefox-bin; do
+	echo "$i"
+	patchelf --set-interpreter "$firefox_interpreter" "$i"
+	patchelf --set-rpath "$firefox_rpath" "$i"
+done
+
+for i in ~/.cache/ms-playwright/firefox-*/firefox/{*.so,*/*.so,*/*/*.so}; do
+	echo "$i"
+	patchelf --set-rpath "$firefox_rpath" "$i"
+done

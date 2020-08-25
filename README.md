@@ -1,6 +1,6 @@
-# playwright browsers on NixOS
+# nixos-playwright
 
-`fix-playwright-browsers` patches the [playwright](https://github.com/microsoft/playwright)-downloaded browser binaries so that they can be run on NixOS.
+The `fix-playwright-browsers` program here patches the [playwright](https://github.com/microsoft/playwright)-downloaded browser binaries so that they can be run on NixOS.
 
 ## Usage
 

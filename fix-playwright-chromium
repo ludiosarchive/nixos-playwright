@@ -1,0 +1,32 @@
+#!/bin/sh
+
+# This requires that you have google-chrome-unstable installed on NixOS.
+
+set -eu -o pipefail
+
+chrome_wrapper=$(which google-chrome-unstable)
+chrome_binary=$(cat "$chrome_wrapper" | grep '^exec ' | grep -o -P '/nix/store/[^"]+' | head -n 1)
+chrome_dir=$(dirname "$chrome_binary")
+chrome_rpath=$(patchelf --print-rpath "$chrome_dir/chrome")
+chrome_interpreter=$(patchelf --print-interpreter "$chrome_dir/chrome")
+
+for i in ~/.cache/ms-playwright/chromium-*/chrome-linux/chrome; do
+	# If we haven't moved it already, move chrome to chrome.bin because we need to wrap it
+	if [[ $(stat -c%s "$i") -gt 1000000 ]]; then
+		mv -i "$i" "$(dirname "$i")/chrome.bin"
+	fi
+	# Write our own wrapper based on NixOS's wrapper
+	cat "$chrome_wrapper" | sed -r "s,^exec .*,exec \"$i.bin\" \"\$@\",g" > $(dirname "$i")/chrome
+	chmod +x "$(dirname "$i")/chrome"
+done
+
+for i in ~/.cache/ms-playwright/chromium-*/chrome-linux/{chrome.bin,chrome?sandbox,nacl_helper}; do
+	echo "$i"
+	patchelf --set-interpreter "$chrome_interpreter" "$i"
+	patchelf --set-rpath "$chrome_rpath" "$i"
+done
+
+for i in ~/.cache/ms-playwright/chromium-*/chrome-linux/{*.so,*/*.so}; do
+	echo "$i"
+	patchelf --set-rpath "$chrome_rpath" "$i"
+done
