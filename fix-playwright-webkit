@@ -1,0 +1,24 @@
+#!/bin/sh
+
+# This requires that you have vimb installed on NixOS.
+
+vimb_wrapper_1=$(which vimb)
+vimb_wrapper_2=$(cat "$vimb_wrapper_1" | grep '^exec ' | grep -o -P '/nix/store/[^"]+' | head -n 1)
+vimb_binary=$(cat "$vimb_wrapper_2" | grep '^exec ' | grep -o -P '/nix/store/[^"]+' | head -n 1)
+vimb_rpath=$(patchelf --print-rpath "$vimb_binary")
+vimb_interpreter=$(patchelf --print-interpreter "$vimb_binary")
+
+set -eu -o pipefail
+
+for i in ~/.cache/ms-playwright/webkit-*/pw_run.sh; do
+	# Fix shebang line
+    sed -i -r 's,#!/bin/bash,#!/bin/sh,g' "$i"
+done
+
+find ~/.cache/ms-playwright/webkit-*/minibrowser-gtk/ -executable -type f | while read i; do
+	echo "$i"
+    if ! [[ "$i" == *.so || "$i" == *.so.* ]]; then
+	    patchelf --set-interpreter "$vimb_interpreter" "$i" || true
+    fi
+	patchelf --set-rpath "$vimb_rpath" "$i" || true
+done
