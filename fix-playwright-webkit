@@ -2,12 +2,12 @@
 
 # This requires that you have luakit installed on NixOS.
 
+set -eu -o pipefail
+
 luakit_wrapper_1=$(which luakit)
 luakit_binary=$(cat "$luakit_wrapper_1" | grep '^exec ' | grep -o -P '/nix/store/[^"]+' | head -n 1)
 luakit_rpath=$(patchelf --print-rpath "$luakit_binary")
 luakit_interpreter=$(patchelf --print-interpreter "$luakit_binary")
-
-set -eu -o pipefail
 
 for i in ~/.cache/ms-playwright/webkit-*/pw_run.sh; do
 	# Fix shebang line
