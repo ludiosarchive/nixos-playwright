@@ -10,6 +10,8 @@ The `fix-playwright-browsers` program here patches the [playwright](https://gith
 
 3. Run `fix-playwright-browsers` or a browser-specific script from this repo.
 
+Remember to run `fix-playwright-browsers` after every NixOS upgrade.
+
 ## Bugs
 
 `fix-playwright-webkit` does not yet result in a working webkit MiniBrowser; PRs welcome.
