@@ -1,12 +1,11 @@
 #!/bin/sh
 
-# This requires that you have vimb installed on NixOS.
+# This requires that you have luakit installed on NixOS.
 
-vimb_wrapper_1=$(which vimb)
-vimb_wrapper_2=$(cat "$vimb_wrapper_1" | grep '^exec ' | grep -o -P '/nix/store/[^"]+' | head -n 1)
-vimb_binary=$(cat "$vimb_wrapper_2" | grep '^exec ' | grep -o -P '/nix/store/[^"]+' | head -n 1)
-vimb_rpath=$(patchelf --print-rpath "$vimb_binary")
-vimb_interpreter=$(patchelf --print-interpreter "$vimb_binary")
+luakit_wrapper_1=$(which luakit)
+luakit_binary=$(cat "$luakit_wrapper_1" | grep '^exec ' | grep -o -P '/nix/store/[^"]+' | head -n 1)
+luakit_rpath=$(patchelf --print-rpath "$luakit_binary")
+luakit_interpreter=$(patchelf --print-interpreter "$luakit_binary")
 
 set -eu -o pipefail
 
@@ -15,10 +14,11 @@ for i in ~/.cache/ms-playwright/webkit-*/pw_run.sh; do
     sed -i -r 's,#!/bin/bash,#!/bin/sh,g' "$i"
 done
 
-find ~/.cache/ms-playwright/webkit-*/minibrowser-gtk/ -executable -type f | while read i; do
+# Not all .so files here are executable
+find ~/.cache/ms-playwright/webkit-*/minibrowser-gtk/ -type f | while read i; do
 	echo "$i"
     if ! [[ "$i" == *.so || "$i" == *.so.* ]]; then
-	    patchelf --set-interpreter "$vimb_interpreter" "$i" || true
+	    patchelf --set-interpreter "$luakit_interpreter" "$i" || true
     fi
-	patchelf --set-rpath "$vimb_rpath" "$i" || true
+	patchelf --set-rpath "$luakit_rpath" "$i" || true
 done
