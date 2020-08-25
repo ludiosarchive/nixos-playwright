@@ -9,3 +9,4 @@ here=$(dirname "$0")
 
 $here/fix-playwright-chromium
 $here/fix-playwright-firefox
+$here/fix-playwright-webkit
