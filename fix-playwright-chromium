@@ -20,13 +20,10 @@ for i in ~/.cache/ms-playwright/chromium-*/chrome-linux/chrome; do
 	chmod +x "$(dirname "$i")/chrome"
 done
 
-for i in ~/.cache/ms-playwright/chromium-*/chrome-linux/{chrome.bin,chrome?sandbox,nacl_helper}; do
+find ~/.cache/ms-playwright/chromium-*/chrome-linux/ -executable -type f | while read i; do
 	echo "$i"
-	patchelf --set-interpreter "$chrome_interpreter" "$i"
-	patchelf --set-rpath "$chrome_rpath" "$i"
-done
-
-for i in ~/.cache/ms-playwright/chromium-*/chrome-linux/{*.so,*/*.so}; do
-	echo "$i"
-	patchelf --set-rpath "$chrome_rpath" "$i"
+    if [[ ! "$i" == *.so ]]; then
+	    patchelf --set-interpreter "$chrome_interpreter" "$i" || true
+    fi
+	patchelf --set-rpath "$chrome_rpath" "$i" || true
 done

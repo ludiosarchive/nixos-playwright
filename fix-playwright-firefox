@@ -17,13 +17,10 @@ for i in ~/.cache/ms-playwright/firefox-*/firefox/firefox; do
 	chmod +x "$(dirname "$i")/firefox"
 done
 
-for i in ~/.cache/ms-playwright/firefox-*/firefox/firefox-bin; do
+find ~/.cache/ms-playwright/firefox-*/firefox/ -executable -type f | while read i; do
 	echo "$i"
-	patchelf --set-interpreter "$firefox_interpreter" "$i"
-	patchelf --set-rpath "$firefox_rpath" "$i"
-done
-
-for i in ~/.cache/ms-playwright/firefox-*/firefox/{*.so,*/*.so,*/*/*.so}; do
-	echo "$i"
-	patchelf --set-rpath "$firefox_rpath" "$i"
+    if [[ ! "$i" == *.so ]]; then
+	    patchelf --set-interpreter "$firefox_interpreter" "$i" || true
+    fi
+	patchelf --set-rpath "$firefox_rpath" "$i" || true
 done
