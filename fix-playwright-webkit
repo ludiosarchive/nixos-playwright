@@ -11,14 +11,14 @@ set -eu -o pipefail
 
 for i in ~/.cache/ms-playwright/webkit-*/pw_run.sh; do
 	# Fix shebang line
-    sed -i -r 's,#!/bin/bash,#!/bin/sh,g' "$i"
+	sed -i -r 's,#!/bin/bash,#!/bin/sh,g' "$i"
 done
 
 # Not all .so files here are executable
 find ~/.cache/ms-playwright/webkit-*/minibrowser-gtk/ -type f | while read i; do
 	echo "$i"
-    if ! [[ "$i" == *.so || "$i" == *.so.* ]]; then
-	    patchelf --set-interpreter "$luakit_interpreter" "$i" || true
-    fi
+	if ! [[ "$i" == *.so || "$i" == *.so.* ]]; then
+		patchelf --set-interpreter "$luakit_interpreter" "$i" || true
+	fi
 	patchelf --set-rpath "$luakit_rpath" "$i" || true
 done

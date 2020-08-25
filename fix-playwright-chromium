@@ -22,8 +22,8 @@ done
 
 find ~/.cache/ms-playwright/chromium-*/chrome-linux/ -executable -type f | while read i; do
 	echo "$i"
-    if [[ ! "$i" == *.so ]]; then
-	    patchelf --set-interpreter "$chrome_interpreter" "$i" || true
-    fi
+	if [[ ! "$i" == *.so ]]; then
+		patchelf --set-interpreter "$chrome_interpreter" "$i" || true
+	fi
 	patchelf --set-rpath "$chrome_rpath" "$i" || true
 done
