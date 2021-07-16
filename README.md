@@ -4,7 +4,7 @@
 
 ## Usage
 
-1. Install `google-chrome-dev` and `firefox-bin` via your NixOS configuration or `nix-env -iA`.
+1. Install `google-chrome` and `firefox-bin` via your NixOS configuration or `nix-env -iA`.
 
 2. Install playwright via npm or yarn and make sure `~/.cache/ms-playwright` has some browsers.
 

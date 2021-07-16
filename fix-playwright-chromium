@@ -1,10 +1,10 @@
 #!/bin/sh
 
-# This requires that you have google-chrome-unstable installed on NixOS.
+# This requires that you have google-chrome-stable installed on NixOS.
 
 set -eu -o pipefail
 
-chrome_wrapper=$(which google-chrome-unstable)
+chrome_wrapper=$(which google-chrome-stable)
 chrome_binary=$(cat "$chrome_wrapper" | grep '^exec ' | grep -o -P '/nix/store/[^"]+' | head -n 1)
 chrome_dir=$(dirname "$chrome_binary")
 chrome_rpath=$(patchelf --print-rpath "$chrome_dir/chrome")
