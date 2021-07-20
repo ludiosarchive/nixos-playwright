@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# This requires that you have google-chrome-unstable installed on NixOS.
+# This requires that you have google-chrome-dev installed on NixOS.
 
 set -eu -o pipefail
 
