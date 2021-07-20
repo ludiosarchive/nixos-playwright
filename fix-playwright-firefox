@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# This requires that you have firefox-bin installed on NixOS.
+# This requires that you have the firefox-bin package installed on NixOS.
 
 set -eu -o pipefail
 
