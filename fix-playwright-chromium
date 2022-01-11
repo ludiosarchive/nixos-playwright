@@ -11,7 +11,16 @@ chrome_dir=$(dirname "$chrome_binary")
 chrome_rpath=$(patchelf --print-rpath "$chrome_dir/chrome")
 chrome_interpreter=$(patchelf --print-interpreter "$chrome_dir/chrome")
 
-for i in ~/.cache/ms-playwright/chromium-*/chrome-linux/chrome; do
+# Via the args you can pass additional directories to patch, e.g.
+# ~/code/js/svelte/node_modules/.pnpm/puppeteer@*/node_modules/puppeteer/.local-chromium/linux-*/chrome-linux
+directories=(
+	~/.cache/ms-playwright/chromium-*/chrome-linux
+	"$@"
+)
+
+for dir in "${directories[@]}"; do
+	i=$dir/chrome
+	echo "wrapping: $i"
 	# If we haven't moved it already, move chrome to chrome.bin because we need to wrap it
 	if [[ $(stat -c%s "$i") -gt 1000000 ]]; then
 		mv -i "$i" "$(dirname "$i")/chrome.bin"
@@ -21,8 +30,8 @@ for i in ~/.cache/ms-playwright/chromium-*/chrome-linux/chrome; do
 	chmod +x "$(dirname "$i")/chrome"
 done
 
-find ~/.cache/ms-playwright/chromium-*/chrome-linux/ -executable -type f | while read i; do
-	echo "$i"
+find "${directories[@]}" -executable -type f | while read i; do
+	echo "patching binary: $i"
 	if ! [[ "$i" == *.so ]]; then
 		patchelf --set-interpreter "$chrome_interpreter" "$i" || true
 	fi
