@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
 # This program fixes the rpaths and interpreters in the playwright-downloaded browser binaries.
 # This requires that you have google-chrome-unstable and firefox-bin installed on NixOS.

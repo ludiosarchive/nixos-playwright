@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
 # This requires that you have the google-chrome-dev package installed on NixOS
 # (note that the executable name is google-chrome-unstable).
